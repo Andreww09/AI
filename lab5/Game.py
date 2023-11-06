@@ -3,7 +3,7 @@ from State import State
 
 class Game:
     def __init__(self):
-        [2, 7, 6, 9, 5, 1, 4, 3, 8]
+        # [2, 7, 6, 9, 5, 1, 4, 3, 8]
         self.magic_square_index = [5, 0, 7, 6, 4, 2, 1, 8, 3]
         self.visited = [0] * 9
         self.state = State()
