@@ -70,7 +70,7 @@ class Game:
                 elif moves[3 * j + i] == 0:
                     cnt_empty += 1
             if cnt_player + cnt_empty == 3:
-                score += scores[cnt_player]
+                score += scores[cnt_player-1]
 
         # diagonala principala
         cnt_player = cnt_empty = 0
@@ -80,7 +80,7 @@ class Game:
             elif moves[3 * i + i] == 0:
                 cnt_empty += 1
         if cnt_player + cnt_empty == 3:
-            score += scores[cnt_player]
+            score += scores[cnt_player-1]
 
         # diagonala secundara
         cnt_player = cnt_empty = 0
@@ -90,7 +90,7 @@ class Game:
             elif moves[3 * i + 2 - i] == 0:
                 cnt_empty += 1
         if cnt_player + cnt_empty == 3:
-            score += scores[cnt_player]
+            score += scores[cnt_player-1]
 
         return score
 
