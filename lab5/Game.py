@@ -106,7 +106,8 @@ class Game:
 
     def minimax(self, depth, maximizing_player, state):
         if depth == 0 or self.is_final(state):
-            return -1 if maximizing_player else 1
+            return self.evaluate(state)
+            # return -1 if maximizing_player else 1
 
         current_state = copy.deepcopy(state)
         if maximizing_player:
