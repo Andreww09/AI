@@ -8,7 +8,6 @@ class Game:
         self.magic_square = [2, 7, 6, 9, 5, 1, 4, 3, 8]
         self.magic_square_index = [5, 0, 7, 6, 4, 2, 1, 8, 3]
         self.visited = [0] * 9
-        self.chosen_numbers = []
         self.state = State()
         self.winner = -1
 
@@ -105,7 +104,7 @@ class Game:
                 values.append(self.magic_square[i])
         return values
 
-    def minimax(self, depth, maximizing_player, state, chosen_numbers):
+    def minimax(self, depth, maximizing_player, state):
         if depth == 0 or self.is_final(state):
             return -1 if maximizing_player else 1
 
@@ -114,8 +113,7 @@ class Game:
             max_eval = float('-inf')
             for value in self.get_possible_values(current_state):
                 current_state.move(2, self.magic_square_index[value - 1])
-                chosen_numbers.append(value)
-                eval = self.minimax(depth-1, False, current_state, chosen_numbers)
+                eval = self.minimax(depth-1, False, current_state)
                 max_eval = max(max_eval, eval)
             return max_eval
 
@@ -123,8 +121,7 @@ class Game:
             min_eval = float('inf')
             for value in self.get_possible_values(current_state):
                 current_state.move(1, self.magic_square_index[value - 1])
-                chosen_numbers.append(value)
-                eval = self.minimax(depth - 1, True, current_state, chosen_numbers)
+                eval = self.minimax(depth - 1, True, current_state)
                 min_eval = min(min_eval, eval)
             return min_eval
 
@@ -134,9 +131,7 @@ class Game:
         current_state = copy.deepcopy(self.state)
         for value in self.get_possible_values(current_state):
             current_state.move(2, self.magic_square_index[value - 1])
-            chosen_numbers = copy.deepcopy(self.chosen_numbers)
-            chosen_numbers.append(value)
-            eval = self.minimax(1, False, self.state, chosen_numbers)
+            eval = self.minimax(1, False, self.state)
             if eval > max_eval:
                 max_eval = eval
                 best_move = value
@@ -158,8 +153,6 @@ class Game:
 
             self.state.move(player, self.magic_square_index[move - 1])
             self.visited[move - 1] = 1
-            self.chosen_numbers.append(move)
-
             player = 3 - player
 
         if self.winner == 0:
