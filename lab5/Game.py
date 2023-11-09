@@ -97,11 +97,13 @@ class Game:
 
         return score
 
-    def get_possible_values(self, chosen_numbers=None):
-        # aici ar trebui luata functia de valuate si de sortat lista returnata in functe de scorul mai mare
-        if chosen_numbers is None:
-            return [i+1 for i in range(len(self.visited)) if self.visited[i] != 0]
-        return [x for x in range(1, 10) if x not in chosen_numbers]
+    def get_possible_values(self, state):
+        moves = state.get_moves()
+        values = []
+        for i in range(0, len(moves)):
+            if moves[i] == 0:
+                values.append(self.magic_square[i])
+        return values
 
     def minimax(self, depth, maximizing_player, state, chosen_numbers):
         if depth == 0 or self.is_final(state):
@@ -110,36 +112,34 @@ class Game:
         current_state = copy.deepcopy(state)
         if maximizing_player:
             max_eval = float('-inf')
-            for value1 in self.get_possible_values(chosen_numbers):
-                for value2 in [x for x in self.get_possible_values(chosen_numbers) if x != value1]:
-                    current_state.move(2, self.magic_square_index[value1 - 1])
-                    current_state.move(1, self.magic_square_index[value2 - 1])
-                    eval = self.minimax(depth-1, False, state, chosen_numbers + [value1, value2])
-                    max_eval = max(max_eval, eval)
+            for value in self.get_possible_values(current_state):
+                current_state.move(2, self.magic_square_index[value - 1])
+                chosen_numbers.append(value)
+                eval = self.minimax(depth-1, False, current_state, chosen_numbers)
+                max_eval = max(max_eval, eval)
             return max_eval
 
         else:
             min_eval = float('inf')
-            for value1 in self.get_possible_values(chosen_numbers):
-                for value2 in [x for x in self.get_possible_values(chosen_numbers) if x != value1]:
-                    current_state.move(2, self.magic_square_index[value1 - 1])
-                    current_state.move(1, self.magic_square_index[value2 - 1])
-                    eval = self.minimax(depth - 1, True, state, chosen_numbers + [value1, value2])
-                    min_eval = min(min_eval, eval)
+            for value in self.get_possible_values(current_state):
+                current_state.move(1, self.magic_square_index[value - 1])
+                chosen_numbers.append(value)
+                eval = self.minimax(depth - 1, True, current_state, chosen_numbers)
+                min_eval = min(min_eval, eval)
             return min_eval
 
     def ai_move(self):
         best_move = None
         max_eval = float('-inf')
         current_state = copy.deepcopy(self.state)
-        for value1 in self.get_possible_values(self.chosen_numbers):
-            for value2 in [x for x in self.get_possible_values(self.chosen_numbers) if x != value1]:
-                current_state.move(2, self.magic_square_index[value1 - 1])
-                current_state.move(1, self.magic_square_index[value2 - 1])
-                eval = self.minimax(1, True, self.state, self.chosen_numbers + [value1, value2])
-                if eval > max_eval:
-                    max_eval = eval
-                    best_move = (value1, value2)
+        for value in self.get_possible_values(current_state):
+            current_state.move(2, self.magic_square_index[value - 1])
+            chosen_numbers = copy.deepcopy(self.chosen_numbers)
+            chosen_numbers.append(value)
+            eval = self.minimax(1, False, self.state, chosen_numbers)
+            if eval > max_eval:
+                max_eval = eval
+                best_move = value
         return best_move
 
     def start(self):
@@ -153,7 +153,7 @@ class Game:
                     print("Invalid move")
                     continue
             else:
-                move, _move = self.ai_move()
+                move = self.ai_move()
                 print(f"AI choose {move}")
 
             self.state.move(player, self.magic_square_index[move - 1])
