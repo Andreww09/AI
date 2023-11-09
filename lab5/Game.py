@@ -1,3 +1,4 @@
+
 import copy
 
 from State import State
@@ -103,41 +104,44 @@ class Game:
             if moves[i] == 0:
                 values.append(self.magic_square[i])
         return values
-
     def minimax(self, depth, maximizing_player, state):
+        current_state = copy.deepcopy(state)
         if depth == 0 or self.is_final(state):
             return self.evaluate(state)
-            # return -1 if maximizing_player else 1
 
-        current_state = copy.deepcopy(state)
+
         if maximizing_player:
             max_eval = float('-inf')
             for value in self.get_possible_values(current_state):
-                current_state.move(2, self.magic_square_index[value - 1])
+                current_state = copy.deepcopy(state)
+                current_state.move(1, self.magic_square_index[value - 1])
                 eval = self.minimax(depth-1, False, current_state)
                 max_eval = max(max_eval, eval)
+
             return max_eval
 
         else:
             min_eval = float('inf')
             for value in self.get_possible_values(current_state):
-                current_state.move(1, self.magic_square_index[value - 1])
+                current_state = copy.deepcopy(state)
+                current_state.move(2, self.magic_square_index[value - 1])
                 eval = self.minimax(depth - 1, True, current_state)
                 min_eval = min(min_eval, eval)
+
             return min_eval
 
     def ai_move(self):
         best_move = None
-        max_eval = float('-inf')
+        max_eval = float('inf')
         current_state = copy.deepcopy(self.state)
         for value in self.get_possible_values(current_state):
+            current_state = copy.deepcopy(self.state)
             current_state.move(2, self.magic_square_index[value - 1])
-            eval = self.minimax(1, False, self.state)
-            if eval > max_eval:
+            eval = self.minimax(1, True, current_state)
+            if eval < max_eval:
                 max_eval = eval
                 best_move = value
         return best_move
-
     def start(self):
 
         player = 1
