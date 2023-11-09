@@ -106,7 +106,12 @@ class Game:
         return values
     def minimax(self, depth, maximizing_player, state):
         current_state = copy.deepcopy(state)
-        if depth == 0 or self.is_final(state):
+
+        if self.is_final(state):
+            if maximizing_player==True:
+                return 0
+            return self.evaluate(state)
+        if depth == 0:
             return self.evaluate(state)
 
 
@@ -137,16 +142,16 @@ class Game:
         for value in self.get_possible_values(current_state):
             current_state = copy.deepcopy(self.state)
             current_state.move(2, self.magic_square_index[value - 1])
-            eval = self.minimax(1, True, current_state)
+            eval = self.minimax(5, True, current_state)
             if eval < max_eval:
                 max_eval = eval
                 best_move = value
         return best_move
     def start(self):
-
+        print()
         player = 1
         while self.is_final(self.state) is False:
-            print("Player", player, "'s turn")
+            print(f"Player {player}, 's turn. Remaining moves: {self.get_possible_values(self.state)}")
             if player == 1:
                 move = int(input())
                 if self.move_is_valid(move) is False:
@@ -163,4 +168,4 @@ class Game:
         if self.winner == 0:
             print("Tie")
         else:
-            print("Player", self.winner, "won!")
+            print(f"Player {self.winner}, won!")
