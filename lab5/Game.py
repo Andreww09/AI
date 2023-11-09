@@ -113,8 +113,8 @@ class Game:
             for value1 in self.get_possible_values(chosen_numbers):
                 for value2 in [x for x in self.get_possible_values(chosen_numbers) if x != value1]:
                     current_state.move(2, self.magic_square_index[value1 - 1])
-                    current_state.move(2, self.magic_square_index[value2 - 1])
-                    eval = self.minimax(depth-1, True, state, chosen_numbers + [value1, value2])
+                    current_state.move(1, self.magic_square_index[value2 - 1])
+                    eval = self.minimax(depth-1, False, state, chosen_numbers + [value1, value2])
                     max_eval = max(max_eval, eval)
             return max_eval
 
@@ -123,16 +123,19 @@ class Game:
             for value1 in self.get_possible_values(chosen_numbers):
                 for value2 in [x for x in self.get_possible_values(chosen_numbers) if x != value1]:
                     current_state.move(2, self.magic_square_index[value1 - 1])
-                    current_state.move(2, self.magic_square_index[value2 - 1])
-                    eval = self.minimax(depth - 1, False, state, chosen_numbers + [value1, value2])
+                    current_state.move(1, self.magic_square_index[value2 - 1])
+                    eval = self.minimax(depth - 1, True, state, chosen_numbers + [value1, value2])
                     min_eval = min(min_eval, eval)
             return min_eval
 
     def ai_move(self):
         best_move = None
         max_eval = float('-inf')
+        current_state = copy.deepcopy(self.state)
         for value1 in self.get_possible_values(self.chosen_numbers):
             for value2 in [x for x in self.get_possible_values(self.chosen_numbers) if x != value1]:
+                current_state.move(2, self.magic_square_index[value1 - 1])
+                current_state.move(1, self.magic_square_index[value2 - 1])
                 eval = self.minimax(1, True, self.state, self.chosen_numbers + [value1, value2])
                 if eval > max_eval:
                     max_eval = eval
