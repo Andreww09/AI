@@ -2,7 +2,7 @@ import random
 
 
 class Q_Algorithm:
-    def __init__(self, n, m, episodes, iterations, environment, lr=0.1, eps=1, min_eps=0.1, decay=0.05, gamma=0.99):
+    def __init__(self, n, m, episodes, iterations, environment, lr=0.1, eps=1, min_eps=0.01, decay=0.05, gamma=0.99):
         # nr de pozitii posibile din grid 7*10
         self.observations = n
         # 4 actiuni posibile
@@ -49,15 +49,16 @@ class Q_Algorithm:
         return x, y
 
     def learn(self):
+
         total_rewards = []
         for i in range(0, self.episodes):
             x_current, y_current = self.environment.reset()
-
+            steps = []
             total_reward = 0
 
             for j in range(0, self.iterations):
-                # nu se poate intoarce in aceeasi pozitie
-                self.environment.viz[x_current][y_current] = 1
+                steps.append((x_current, y_current))
+
                 current_state = self.get_state(x_current, y_current)
 
                 if random.random() < self.eps:
@@ -67,31 +68,29 @@ class Q_Algorithm:
                     #exploatare
                     action = self.best_action(x_current, y_current, current_state)
 
-                #daca nu are nicio actiune posibila se opreste
-                if action == -1:
-                    end = True
-                    reward = -100
-                else:
-                    x_next, y_next = self.get_next(x_current, y_current, action)
-                    next_state = self.get_state(x_next, y_next)
-                    # recompensa daca trecem in urmatoarea pozitie aleasa
-                    end, reward = self.environment.get_transition(x_next, y_next)
+                x_next, y_next = self.get_next(x_current, y_current, action)
+                next_state = self.get_state(x_next, y_next)
 
-                    # actualizare Qtable
-                    self.Qtable[current_state][action] = self.Qtable[current_state][action] - self.lr * (
-                            reward + self.gamma * max(self.Qtable[next_state]) -
-                            self.Qtable[current_state][action])
-                    # trece in pozitia urmatoare
-                    x_current = x_next
-                    y_current = y_next
+                # recompensa daca trecem in urmatoarea pozitie aleasa
+                end, reward = self.environment.get_transition(x_next, y_next)
+
+                # actualizare Qtable
+                self.Qtable[current_state][action] = self.Qtable[current_state][action] + self.lr * (
+                        reward + self.gamma * max(self.Qtable[next_state]) -
+                        self.Qtable[current_state][action])
+                # trece in pozitia urmatoare
+                x_current = x_next
+                y_current = y_next
 
                 total_reward += reward
-                self.eps -= max(self.min_eps, self.decay)
+                self.eps = max(self.min_eps,self.eps-self.decay)
                 if end:
                     break
 
             total_rewards.append(total_reward)
-
+            if (i+1)%1000==0:
+                print(steps)
         for i in range(0, len(total_rewards)):
             if (i + 1) % 1000 == 0:
                 print(f"{i}: {total_rewards[i]}")
+
